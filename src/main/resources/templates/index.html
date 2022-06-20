@@ -1,0 +1,49 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+  <link rel="stylesheet"
+        th:href="@{/css/tailwind.css}"
+        href="../../../../target/classes/static/tailwind.css"
+  >
+</head>
+<body>
+<section class="container w-full md:max-w-3xl mx-auto pt-20">
+  <header class="w-full px-4 md:px-6 text-xl text-gray-800 leading-normal">
+    <h1 class="font-medium text-5xl mt-0 mb-2 text-red-600 text-center">Todos</h1>
+    <form class="bg-white rounded-md text-center"
+          th:action="@{/}" method="post" th:object="${item}">
+      <input
+          class="border-2 border-rose-300 rounded sm:text-base bg-white text-gray-500 focus:outline-none focus:ring-0"
+          placeholder="What needs to be done?" autofocus
+          th:field="*{title}">
+    </form>
+  </header>
+  <section class="w-full px-4 text-xl text-gray-800 leading-normal">
+    <ul>
+      <th:block th:insert="fragments :: todoItem(item)" th:each="item : ${todos}">
+      </th:block>
+    </ul>
+  </section>
+  <footer class="w-full px-4 pt-10 text-center grid grid-cols-3 text-gray-800 leading-normal">
+      <span class="inline-block justify-self-start text-sm text-gray-500">1 item left</span>
+      <ul class="text-sm text-gray-500">
+        <a th:ref="@{/}"
+           th:classappend="${filter.name() == 'ALL' ? 'selected' : ''}"
+        >All</a>
+        <a th:ref="@{/active}"
+           th:classappend="${filter.name() == 'ACTIVE' ? 'selected' : ''}"
+        >Active</a>
+        <a class="selected" th:ref="@{/completed}"
+           th:classappend="${filter.name() == 'COMPLETED' ? 'selected' : ''}"
+        >Completed</a>
+      </ul>
+      <form justify-self-end th:action="@{/completed}" th:method="delete"
+            th:if="${numberOfCompletedItems > 0}">
+        <button class="text-sm text-gray-500">Clear completed</button>
+      </form>
+    </footer>
+</section>
+</body>
+</html>

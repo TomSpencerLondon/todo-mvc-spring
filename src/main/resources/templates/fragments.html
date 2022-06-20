@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<li class="list-none flex flex-row items-center w-full" th:fragment="todoItem(item)">
+    <form class="w-4/5" th:action="@{/{id}/toggle(id=${item.id})}" th:method="put">
+      <div>
+        <input
+            class="focus:ring-rose-500 h-4 text-rose-600 border-gray-300 rounded"
+            name="delete"
+            type="checkbox"
+            onchange="this.form.submit()"
+            id="flexCheckDefault"
+            th:attrappend="checked=${item.completed ? 'true' : null }"
+        >
+        <label class="inline-block text-gray-800"
+               for="flexCheckDefault"
+               th:text="${item.title}"
+               th:classappend="${item.completed ? 'line-through' : ''}"
+        >
+        </label>
+      </div>
+    </form>
+    <form class="w-1/5 self-right" th:action="@{/{id}(id=${item.id})}" th:method="delete">
+      <button type="button" class="px-3 py-2 my-2 ml-8 text-xs font-medium text-center text-white bg-rose-400 rounded-lg hover:bg-rose-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+        Delete
+      </button>
+    </form>
+</li>
+</html>
