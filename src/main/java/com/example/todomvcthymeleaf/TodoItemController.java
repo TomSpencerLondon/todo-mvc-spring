@@ -3,8 +3,10 @@ package com.example.todomvcthymeleaf;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,22 +27,51 @@ public class TodoItemController {
   @GetMapping
   public String index(Model model) {
     addAttributesForIndex(model, ListFilter.ALL);
+
     return "index";
   }
 
-  private void addAttributesForIndex(Model model,
-      ListFilter listFilter) {
-    model.addAttribute("item", new TodoItemFormData());
-    model.addAttribute("filter", listFilter);
-    model.addAttribute("todos", getTodoItems(listFilter));
-    model.addAttribute("totalNumberOfItems", repository.count());
-    model.addAttribute("numberOfActiveItems", getNumberOfActiveItems());
-    model.addAttribute("numberOfCompletedItems", getNumberOfCompletedItems());
+  @GetMapping("/active")
+  public String indexActive(Model model) {
+    addAttributesForIndex(model, ListFilter.ACTIVE);
+    return "index";
+  }
+
+  @GetMapping("/completed")
+  public String indexCompleted(Model model) {
+    addAttributesForIndex(model, ListFilter.COMPLETED);
+    return "index";
+  }
+
+  @DeleteMapping("/{id}")
+  public String deleteTodoItem(@PathVariable("id") Long id) {
+    repository.deleteById(id);
+    return "redirect:/";
+  }
+
+  @DeleteMapping("/completed")
+  public String deleteCompletedItems() {
+    List<TodoItem> items = repository.findAllByCompleted(true);
+    for (TodoItem item : items) {
+      repository.deleteById(item.getId());
+    }
+    return "redirect:/";
   }
 
   @PostMapping
   public String addNewTodoItem(@Valid @ModelAttribute("item") TodoItemFormData formData) {
     repository.save(new TodoItem(formData.getTitle(), false));
+
+    return "redirect:/";
+  }
+
+  @PutMapping("/toggle-all")
+  public String toggleAll() {
+    List<TodoItem> todoItems = repository.findAll();
+    for (TodoItem todoItem : todoItems) {
+      todoItem.setCompleted(true);
+      repository.save(todoItem);
+    }
 
     return "redirect:/";
   }
@@ -55,6 +86,16 @@ public class TodoItemController {
     repository.save(todoItem);
 
     return "redirect:/";
+  }
+
+  private void addAttributesForIndex(Model model,
+      ListFilter listFilter) {
+    model.addAttribute("item", new TodoItemFormData());
+    model.addAttribute("filter", listFilter);
+    model.addAttribute("todos", getTodoItems(listFilter));
+    model.addAttribute("totalNumberOfItems", repository.count());
+    model.addAttribute("numberOfActiveItems", getNumberOfActiveItems());
+    model.addAttribute("numberOfCompletedItems", getNumberOfCompletedItems());
   }
 
   private List<TodoItemDto> getTodoItems(ListFilter filter) {
