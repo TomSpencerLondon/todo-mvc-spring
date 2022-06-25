@@ -3,6 +3,7 @@ package com.example.todomvcthymeleaf;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
@@ -10,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 public class TodoItem {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
 
   public TodoItem(String title, boolean isComplete) {

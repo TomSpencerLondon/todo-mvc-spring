@@ -3,9 +3,9 @@ package com.example.todomvcthymeleaf;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -59,7 +59,14 @@ public class TodoItemController {
   }
 
   @PostMapping
-  public String addNewTodoItem(@Valid @ModelAttribute("item") TodoItemFormData formData) {
+  public String addNewTodoItem(
+      Model model,
+      @Valid @ModelAttribute("item") TodoItemFormData formData,
+      BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      addAttributesForTodoList(model, ListFilter.ALL);
+      return "index";
+    }
     repository.save(new TodoItem(formData.getTitle(), false));
 
     return "redirect:/";
@@ -91,6 +98,10 @@ public class TodoItemController {
   private void addAttributesForIndex(Model model,
       ListFilter listFilter) {
     model.addAttribute("item", new TodoItemFormData());
+    addAttributesForTodoList(model, listFilter);
+  }
+
+  private void addAttributesForTodoList(Model model, ListFilter listFilter) {
     model.addAttribute("filter", listFilter);
     model.addAttribute("todos", getTodoItems(listFilter));
     model.addAttribute("totalNumberOfItems", repository.count());

@@ -14,10 +14,25 @@
     <h1 class="font-medium text-5xl mt-0 mb-2 text-red-600 text-center">Todos</h1>
     <form class="bg-white rounded-md text-center"
           th:action="@{/}" method="post" th:object="${item}">
-      <input
-          class="border-2 border-rose-300 rounded sm:text-base bg-white text-gray-500 focus:outline-none focus:ring-0"
-          placeholder="What needs to be done?" autofocus
-          th:field="*{title}">
+      <input type="hidden" th:field="${filter}"/>
+      <div class="grid grid-cols-3">
+        <input
+            class="col-start-2 col-span-1 border-2 border-rose-300 rounded bg-white text-gray-500 focus:outline-none focus:ring-0"
+            placeholder="What needs to be done?" autofocus
+            th:field="*{title}">
+        <div th:if="${#fields.hasErrors('title')}" class="flex col-span-1 pointer-events-none">
+          <!-- Heroicon name: solid/exclamation-circle -->
+          <svg class="self-center h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+               fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"/>
+          </svg>
+        </div>
+      </div>
+      <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
+         class="mt-2 text-sm text-red-600" id="email-error">
+      </p>
     </form>
   </header>
   <section class="w-full px-4 text-xl text-gray-800 leading-normal">
@@ -26,18 +41,18 @@
       </th:block>
     </ul>
   </section>
-  <footer class="w-full px-4 pt-10 text-center grid grid-cols-5 text-gray-800 leading-normal">
+  <footer class="w-full px-4 pt-10 grid grid-cols-5 place-items-center text-gray-800 leading-normal">
     <th:block th:unless="${numberOfActiveItems == 1}">
-        <span class="inline-block justify-self-start text-sm text-gray-500">
+        <span class="text-sm text-gray-500">
           <strong th:text="${numberOfActiveItems}">0</strong> items left
         </span>
     </th:block>
     <th:block th:if="${numberOfActiveItems == 1}">
-        <span class="inline-block justify-self-start text-sm text-gray-500">
+        <span class="text-sm text-gray-500">
           <strong>1</strong> item left
         </span>
     </th:block>
-    <ul class="text-sm text-gray-500 col-span-2">
+    <ul class="text-sm text-gray-500 col-start-3">
       <a th:href="@{/}"
          th:classappend="${filter.name() == 'ALL' ? 'selected' : ''}"
       >All</a>
@@ -50,7 +65,7 @@
     </ul>
     <form th:action="@{/toggle-all}" th:method="put"
           th:if="${numberOfCompletedItems > 0}">
-      <button class="text-sm text-gray-500">Mark all as complete</button>
+      <button class="text-sm text-gray-500">Mark all complete</button>
     </form>
     <form th:action="@{/completed}" th:method="delete"
           th:if="${numberOfCompletedItems > 0}">
